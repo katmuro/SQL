@@ -32,3 +32,4 @@ SELECT DISTINCT Product, SUM(Quantity)
 FROM BIT_DB.FebSales
 WHERE locatin LIKE '%Los Angeles%'
 GROUP BY Product
+
