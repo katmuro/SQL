@@ -1,0 +1,104 @@
+#In this SQL, I'm querying a database with multiple tables to gather stats about a digital media store. 
+
+#1. Who are the customers that are not in the USA?
+SELECT firstname, lastname, customerid, country
+FROM chinook.customers
+WHERE country <> 'USA';
+
+#2. Who are the customers from Brazil? List them by city.
+SELECT *
+FROM chinook.customers
+WHERE country = 'Brazil'
+GROUP BY city
+ORDER BY city;
+
+#3. Which customers listed Canada as their billing country?
+SELECT cust.firstname, cust.lastname, inv.invoiceid, inv.invoicedate, inv.BillingCountry
+FROM chinook.customers cust
+LEFT JOIN chinook.invoices inv
+ON cust.customerid=inv.InvoiceId
+WHERE inv.BillingCountry LIKE 'Canada';
+
+#4. Which employees are Sales Support Agent's?
+SELECT employeeid, lastname, firstname, title, hiredate
+FROM chinook.employees
+WHERE title LIKE 'Sales%Agent';
+
+#5. What countries do our customers from? 
+SELECT DISTINCT (billingcountry)
+FROM chinook.invoices;
+
+#6. List invoices associated with each sales agent.
+SELECT inv.InvoiceId, emp.FirstName, emp.LastName, emp.Title
+FROM chinook.employees emp
+JOIN chinook.customers cust
+ON emp.EmployeeId=cust.SupportRepId
+JOIN chinook.invoices inv
+ON cust.CustomerId=inv.customerid;
+
+#7. How much did the customer spend on each purchase? List by Sales Support Agent.
+SELECT inv.InvoiceId, inv.Total AS InvoiceTotal, cust.FirstName AS CustomerFirst, cust.LastName AS CustomerLast, cust.Country AS Country, emp.FirstName AS EmpFirst, emp.LastName As EmpLast, emp.Title AS JobTitle
+FROM chinook.employees emp
+JOIN chinook.customers cust
+ON emp.EmployeeId=cust.SupportRepId
+JOIN chinook.invoices inv
+ON cust.CustomerId=inv.CustomerId;
+
+#8. How many Invoices were there in 2009?
+SELECT COUNT(*)
+FROM chinook.invoices
+WHERE invoicedate LIKE '%2009%';
+
+#9. What are the total sales for 2009?
+SELECT SUM(total)
+FROM chinook.invoices
+WHERE invoicedate LIKE '%2009%';
+
+#10. List each invoice with the track(song) name that was purchased.
+SELECT i.InvoiceLineId, t.Name
+FROM chinook.invoice_items i
+JOIN chinook.tracks t
+ON i.TrackId=t.TrackId;
+
+#11. List the album an track(song) name that was purchased, list by invoice number.
+SELECT invoice_items.invoicelineid AS InvoiceId,  artists.name AS Artist, tracks.name AS Track
+FROM chinook.invoice_items 
+JOIN chinook.tracks 
+ON chinook.invoice_items.TrackId=chinook.tracks.TrackId
+JOIN chinook.albums 
+ON chinook.tracks.AlbumId=chinook.albums.AlbumId
+JOIN chinook.artists 
+ON  chinook.albums.ArtistId=chinook.artists.ArtistId;
+
+#12. List  Album name, tracks (songs), Media type and Genre for all sales.
+SELECT Albums.title AS AlbumName, tracks.name AS Track, genres.Name AS Genre, media_types.name AS MediaType
+FROM chinook.albums
+JOIN chinook.tracks
+ON chinook.tracks.AlbumId=chinook.albums.AlbumId
+JOIN chinook.media_types
+ON chinook.tracks.MediaTypeId=chinook.media_types.MediaTypeId
+JOIN chinook.genres
+ON chinook.tracks.GenreId=chinook.genres.GenreId;
+
+#13. What are the total sales for each sales agent?
+SELECT inv.InvoiceId, emp.FirstName AS EmpFirst, emp.LastName As EmpLast, emp.Title AS JobTitle, SUM(inv.Total) AS TotalSales
+FROM chinook.employees emp
+JOIN chinook.customers cust
+ON emp.EmployeeId=cust.SupportRepId
+JOIN chinook.invoices inv
+ON cust.CustomerId=inv.InvoiceId
+GROUP BY emp.FirstName, emp.LastName;
+
+
+#14. Which sales agent made the most dollars in sales in 2009?
+SELECT emp.FirstName AS EmpFirst, emp.LastName As EmpLast, emp.Title AS JobTitle, (ROUND(SUM(Inv.Total), 2)) AS TotalSales
+FROM chinook.employees emp
+JOIN chinook.customers cust
+ON emp.EmployeeId=cust.SupportRepId
+JOIN chinook.invoices inv
+ON cust.CustomerId=inv.CustomerId
+WHERE invoicedate LIKE '%2009%'
+GROUP by emp.FirstName
+ORDER BY totalsales DESC
+LIMIT 1;
+
