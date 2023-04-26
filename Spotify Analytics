@@ -1,0 +1,79 @@
+# For this project, I downloaded Spotify data from Kaggle.
+# Then I created a table to insert Spotify data into.
+# Finally, I performed analytics on the data using SQL. 
+
+#Creating the table: 
+CREATE TABLE BIT_DB.Spotifydata (
+id integer PRIMARY KEY,
+artist_name varchar NOT NULL,
+track_name varchar NOT NULL,
+track_id varchar NOT NULL,
+popularity integer NOT NULL,
+danceability decimal(4,3) NOT NULL,
+energy decimal(4,3) NOT NULL,
+key integer NOT NULL,
+loudness decimal(5,3) NOT NULL,
+mode integer NOT NULL,
+speechiness decimal(5,4) NOT NULL,
+acousticness decimal(6,5) NOT NULL,
+instrumentalness text NOT NULL,
+liveness decimal(5,4) NOT NULL,
+valence decimal(4,3) NOT NULL,
+tempo decimal(6,3) NOT NULL,
+duration_ms integer NOT NULL,
+time_signature integer NOT NULL 
+)
+
+#Then I inserted the Spotify Data .csv into the table.
+
+#Next, I explored the data using the following SQL. 
+
+#1. What is the average danceability by artist and track?
+SELECT artist_name, track_name, AVG(danceability)
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name, track_name 
+
+#2. Determine the avg popularity, danceability, and energy by artist and track. 
+SELECT artist_name, track_name, AVG(popularity), AVG(danceability), AVG(energy)
+FROM BIT_DB.spotifydata
+GROUP BY artist_name, track_name
+
+#3. Who are the top 10 artists based on popularity? 
+SELECT artist_name, track_name, popularity
+FROM BIT_DB.Spotifydata
+ORDER BY popularity DESC
+LIMIT 10
+
+#4. Which artist released the longest song?
+SELECT artist_name, track_name, duration_ms
+FROM BIT_DB.Spotifydata
+ORDER BY duration_ms DESC
+LIMIT 1
+
+#5. What's the average danceability for the 10 most popular songs?
+SELECT AVG(danceability)
+FROM BIT_DB.spotifydata
+ORDER BY popularity DESC
+LIMIT 10
+
+#6. Who are the top 3 artists and songs with the most energy?
+SELECT artist_name, track_name, energy
+FROM BIT_DB.spotifydata
+HAVING energy > .4 
+ORDER BY energy DESC
+LIMIT 3
+
+#7. Name the top 5 artist who's name start with T, in order by popularity with top liveness and tempo. 
+SELECT artist_name, liveness, tempo, popularity
+FROM BIT_DB.spotifydata
+WHERE artist_name LIKE 't%'
+AND liveness > .1
+AND tempo > 90
+ORDER By popularity
+LIMIT 5
+
+#8. What is the name of the artist with the least popular song?
+SELECT artist_name, track_name, popularity
+FROM BIT_DB.spotifydata
+ORDER BY popularity ASC
+LIMIT 1
